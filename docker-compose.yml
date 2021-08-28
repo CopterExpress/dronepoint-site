@@ -1,0 +1,18 @@
+version: '3'
+services:
+  python-server:
+    image: python-server
+    network_mode: "host"
+    ports:
+      - '5000:5000'
+      - '0.0.0.0:14540:14540/udp'
+    env_file: .env
+    build: .
+  react-server:
+    image: react-server
+    network_mode: "host"
+    ports:
+      - '3000:3000'
+    build: ./client
+    depends_on: 
+      - 'python-server'
