@@ -8,42 +8,31 @@ const server = require('http').Server(app);
 const io = require('socket.io')(server, { cors: { origin: '*' }});
 
 const stream = new rtsp.FFMpeg({ 
-  input: 'http://192.168.194.207:8080/stream?topic=/main_camera/image_raw'
+  input: 'http://10.0.0.106:8080/stream?topic=/front_camera/image_raw'
 })
 
 const dpStream = new rtsp.FFMpeg({
-  input: 'http://192.168.194.183:8080/stream?topic=/main_camera/image_raw',
+  input: 'http://10.0.0.106:8080/stream?topic=/thermal_camera/image_raw',
 })
 
-dpStream.on('data', e => {
-  // console.log("YEEEEE");
-});
+const startStream = (streamObj) => {
+  streamObj.on('error', e => {
+    console.log('Error in Stream');
+  });
+  streamObj.on('close', e => {
+    console.log('Stream closed');
+    streamObj.start();
+  });
+  streamObj.start();
+}
 
-dpStream.on('error', e => {
-  console.log('error dp');
-  console.log(e);
-})
+const pipeStreams = (dronePipe, dpPipe) => {
+  stream.on('data', dronePipe);
+  dpStream.on('data', dpPipe);
+}
 
-dpStream.on('close', e => {
-  console.log('close dp');
-  console.log(e);
-})
-
-stream.on('error', e => {
-  console.log('error');
-  console.log(e);
-})
-
-stream.on('close', e => {
-  console.log('close');
-  console.log(e);
-})
-
-stream.on('data', e => {
-  // console.log('drone data');
-})
-
-stream.start();
+startStream(stream);
+startStream(dpStream);
 
 io.on('connection', (socket) => {
   console.log('connection');
@@ -59,6 +48,7 @@ io.on('connection', (socket) => {
   dpStream.on('data', dpPipeStream);
   socket.on('disconnect', () => {
     stream.removeListener('data', pipeStream);
+    dpStream.removeListener('data', pipeStream);
   });
 })
 

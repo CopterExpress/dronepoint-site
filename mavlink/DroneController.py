@@ -104,7 +104,7 @@ class DroneController:
                 0,
                 0,
             )
-            time.sleep(0.5)
+            time.sleep(config.DRONE_HEARTBEAT_DELAY)
     
     # Global position int listener: update drone's position
     def GLOBAL_POSITION_INT_HANDLER(self, msg_dict):
@@ -272,7 +272,7 @@ class DroneController:
             mavlink.MAV_CMD_NAV_WAYPOINT,
             0,
             1,
-            0, 10, 0, math.nan,
+            0, 10, 0, self.angle,
             point[0],
             point[1],
             config.FLIGHT_ALT,
@@ -296,7 +296,7 @@ class DroneController:
             0, # Alt
         )
         wp.add(p)
-
+        
         self.listening = False
 
         # Send waypoints
@@ -308,7 +308,7 @@ class DroneController:
             observer.write(str(msg))
             self.mavconn.mav.send(wp.wp(msg.seq))
             observer.write(f'Sending waypoint {msg.seq}')
-
+            
         # Start Mission
         self.listening = True
         time.sleep(1)

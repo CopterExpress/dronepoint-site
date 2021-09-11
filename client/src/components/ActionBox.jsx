@@ -81,14 +81,14 @@ const ActionBox = ({ cell, allCells, onCellChange, onTest }) => {
             <LoginDialog 
             open={open}
             onClose={handleClose} onSubmit={handleSubmit} />
-            <Typography variant="h2">Choose a cell</Typography>
+            {/* <Typography variant="h2">Choose a cell</Typography>
             <Cells 
             allCells={allCells} 
             value={cell} 
             onChange={onCellChange}
             className={classes.cellsSelect} 
             disabled={stationDisabled} 
-            />
+            /> */}
             <Box className={classes.buttonBox}>
                 <Button 
                 className={classes.button}
@@ -119,7 +119,10 @@ const ActionBox = ({ cell, allCells, onCellChange, onTest }) => {
                 onClick={handleOpen('full')}
                 disabled={fullDisabled}
                 >
-                    <Typography variant={isMobile ? 'h5' : 'h4'}>Execute Test (Full Iteration)</Typography>
+                    <Typography variant={isMobile ? 'h5' : 'h4'}>
+                        {/* Execute Test (Full Iteration) */}
+                        Execute Mission
+                    </Typography>
                 </Button>
             </Box>
             <Box className={classes.stateBox}>

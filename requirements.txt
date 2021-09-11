@@ -2,7 +2,6 @@ bidict==0.21.2
 certifi==2020.12.5
 chardet==4.0.0
 click==8.0.0
-dataclasses==0.8
 Flask==2.0.0
 Flask-Cors==3.0.10
 Flask-Login==0.5.0
@@ -18,7 +17,6 @@ MarkupSafe==2.0.0
 Naked==0.1.31
 numpy==1.19.5
 opencv-python==4.5.2.52
-pkg-resources==0.0.0
 pymavlink==2.4.15
 pymongo==3.11.4
 python-dotenv==0.17.1

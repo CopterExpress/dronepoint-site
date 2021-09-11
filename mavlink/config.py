@@ -12,9 +12,13 @@ class DronepointConfig:
     DRONE_CONNECTION_TIMEOUT = 6
     STATION_CONNECTION_TIMEOUT = 3
 
+    DRONE_HEARTBEAT_DELAY = 1.5
+
+    DRONE_CREATE_MISSION = True
+
     # Flight
     FLIGHT_DISTANCE = 0.00018 # 20 meters
-    FLIGHT_ALT = 20
+    FLIGHT_ALT = 15
     
     # Minimum difference of position to update history
     MIN_POS_DIFFERENCE = 100
