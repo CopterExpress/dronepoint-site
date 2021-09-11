@@ -98,8 +98,13 @@ class DroneController:
     def send_heartbeats(self):
         while True:
             self.mavconn.mav.heartbeat_send(
-                0,
-                0,
+                # 0,
+                # 0,
+                # 0,
+                # 0,
+                # 0,
+                mavlink.MAV_TYPE_GCS,
+                mavlink.MAV_AUTOPILOT_GENERIC,
                 0,
                 0,
                 0,
@@ -184,7 +189,8 @@ class DroneController:
 
     # Initiate flight mission
     def start_flight_mission(self):
-        observer.write('Initiating Flight Mission')
+        custom_msg = 'WITH' if config.DRONE_CUSTOM_MISSION else 'WITHOUT'
+        observer.write(f'Initiating Flight Mission {custom_msg} Custom Mission')
         wp.clear()
         # Frame
         frame = mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT
@@ -299,19 +305,24 @@ class DroneController:
         
         self.listening = False
 
-        # Send waypoints
-        self.mavconn.waypoint_clear_all_send()
-        self.mavconn.waypoint_count_send(wp.count())
+        # If custom mission, send waypoints
+        if config.DRONE_CUSTOM_MISSION:
+            # Send waypoints
+            observer.write('Clearing waypoints')
+            self.mavconn.waypoint_clear_all_send()
+            mission_ack = self.mavconn.recv_match(type=['MISSION_ACK'], blocking=True)
+            observer.write(str(mission_ack))
+            observer.write('Sending waypoint count')
+            self.mavconn.waypoint_count_send(wp.count())
 
-        for i in range(wp.count()):
-            msg = self.mavconn.recv_match(type=['MISSION_REQUEST'], blocking=True)
-            observer.write(str(msg))
-            self.mavconn.mav.send(wp.wp(msg.seq))
-            observer.write(f'Sending waypoint {msg.seq}')
-            
+            for i in range(wp.count()):
+                msg = self.mavconn.recv_match(type=['MISSION_REQUEST'], blocking=True)
+                observer.write(str(msg))
+                self.mavconn.mav.send(wp.wp(msg.seq))
+                observer.write(f'Sending waypoint {msg.seq}')
+
         # Start Mission
-        self.listening = True
-        time.sleep(1)
         self.mavconn.set_mode_auto()
+        self.listening = True
         observer.write(f'Started Mission with {wp.count()} waypoints')
         return wp.count()

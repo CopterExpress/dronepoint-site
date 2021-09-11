@@ -14,7 +14,7 @@ class DronepointConfig:
 
     DRONE_HEARTBEAT_DELAY = 1.5
 
-    DRONE_CREATE_MISSION = True
+    DRONE_CUSTOM_MISSION = True
 
     # Flight
     FLIGHT_DISTANCE = 0.00018 # 20 meters
