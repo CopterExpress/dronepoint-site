@@ -19,6 +19,13 @@ class Mavlink:
         self.station_controller = StationController()
         # Drone Controller
         self.drone_controller = DroneController()
+        # Custom mission
+        self.custom_mission = True
+    
+    # Set custom mission parameter
+    def set_custom_mission(self, custom_mission):
+        if custom_mission is not None:
+            self.custom_mission = bool(custom_mission)
     
     # Validate if it's possible to start test
     def validate_test(self, test_type):
@@ -61,58 +68,9 @@ class Mavlink:
     def execute_flight(self):
         observer.write('Flight started')
         observer.write(f'start angle: {self.drone_controller.angle}')
-        time_flight = self.drone_controller.execute_flight()
+        time_flight = self.drone_controller.execute_flight(custom_mission=self.custom_mission)
         observer.write(f'end angle: {self.drone_controller.angle}')
         observer.write(f'Flight ended in {time_flight}')
-    
-    # def execute_something(self):
-    #     def open_irlock():
-    #         observer.write('Opening Irlock')
-    #         self.station_controller.send_command(config.STATE_SERVICE, config.CUSTOM_MODE_LOCK_ON)
-    #     def close_irlock():
-    #         observer.write('Closing Irlock')
-    #         self.station_controller.send_command(config.STATE_SERVICE, config.CUSTOM_MODE_LOCK_OFF)
-        
-    #     self.executing = True
-    #     # Open
-    #     self.station_controller.execute_command(config.STATE_OPEN)
-    #     # Delay
-    #     time.sleep(config.STATION_DELAY)
-    #     # Close
-    #     self.station_controller.execute_command(config.STATE_CLOSED)
-    #     # Delay
-    #     time.sleep(config.STATION_DELAY)
-    #     # Close
-    #     self.station_controller.execute_command(config.STATE_OPEN, 1)
-    #     # Delay
-    #     time.sleep(config.STATION_DELAY)
-    #     # Close
-    #     self.station_controller.execute_command(config.STATE_LOCK_RELEASE)
-    #     # Delay
-    #     time.sleep(config.STATION_DELAY)
-    #     # Close
-    #     self.station_controller.execute_command(config.STATE_LOCK_LOCK)
-    #     # Delay
-    #     time.sleep(config.STATION_DELAY)
-    #     # Close
-    #     self.station_controller.execute_command(config.STATE_LOCK_RELEASE)
-    #     # Delay
-    #     time.sleep(config.STATION_DELAY)
-    #     open_irlock()
-    #     time.sleep(5)
-    #     close_irlock()
-    #     # Close
-    #     self.station_controller.execute_command(config.STATE_LOCK_LOCK)
-    #     # Delay
-    #     time.sleep(config.STATION_DELAY)
-    #     # Close
-    #     self.station_controller.execute_command(config.STATE_SERVICE, config.CUSTOM_MODE_STOP)
-    #     # Delay
-    #     time.sleep(config.STATION_DELAY)
-    #     observer.write('executed')
-
-    #     self.executing = False
-
 
     def execute_iteration(self, flight=False):
         def open_irlock():
@@ -145,7 +103,7 @@ class Mavlink:
         # Execute drone flight
         if flight:
             observer.write('Start flight function')
-            time_flight = self.drone_controller.execute_flight()
+            time_flight = self.drone_controller.execute_flight(custom_mission=self.custom_mission)
         else:
             time_flight = 0.0
             observer.write('No flight')
@@ -198,6 +156,7 @@ class Mavlink:
                 "drone": self.drone_controller.connected,
                 "station": self.station_controller.connected,
             },
+            "custom_mission": self.custom_mission,
         }
     
     # Dynamically get state of test

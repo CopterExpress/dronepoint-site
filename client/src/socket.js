@@ -38,6 +38,10 @@ export const sendGetVideoEvent = () => {
     socket.emit('getvideo');
 }
 
+export const sendCustomMissionEvent = (custom_mission) => {
+    socket.emit('change_custom_mission', { custom_mission });
+}
+
 export const sendLogEvent = () => {
     socket.emit('getlog');
 }

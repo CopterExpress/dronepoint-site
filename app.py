@@ -49,6 +49,10 @@ def start_test(json):
         return emit('error', 'Invalid Password')
     mavlink.test(json['test_type'])
 
+@socketio.on('change_custom_mission')
+def change_mission(json):
+    mavlink.set_custom_mission(json['custom_mission'])
+
 @socketio.on('getlog')
 def send_log():
     return emit('log', observer.get_messages())

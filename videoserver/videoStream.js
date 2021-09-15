@@ -8,11 +8,11 @@ const server = require('http').Server(app);
 const io = require('socket.io')(server, { cors: { origin: '*' }});
 
 const stream = new rtsp.FFMpeg({ 
-  input: 'http://10.0.0.106:8080/stream?topic=/front_camera/image_raw'
+  input: 'http://190.0.0.182:8080/stream?topic=/front_camera/image_raw'
 })
 
 const dpStream = new rtsp.FFMpeg({
-  input: 'http://10.0.0.106:8080/stream?topic=/thermal_camera/image_raw',
+  input: 'http://190.0.0.182:8080/stream?topic=/thermal_camera/image_raw',
 })
 
 const startStream = (streamObj) => {

@@ -1,6 +1,6 @@
 import React, { createContext, useEffect, useRef, useState } from 'react'
 import { toast } from 'react-toastify';
-import { login, sendGetDataEvent, sendGetVideoEvent, sendLogEvent, sendTestEvent, subscribeConnectEvent, 
+import { login, sendCustomMissionEvent, sendGetDataEvent, sendGetVideoEvent, sendLogEvent, sendTestEvent, subscribeConnectEvent, 
     subscribeDataEvent, subscribeErrorEvent, subscribeLogEvent, subscribeVideoEvent, unsubscribeVideoEvent } from '../socket';
 
 export const StationContext = createContext({
@@ -8,6 +8,7 @@ export const StationContext = createContext({
     loading: true,
     startTest: (cell, password) => {},
     authenticate: async (password) => false,
+    changeCustomMission: async (value) => {},
     isAuthenticated: false,
     connection: { drone: false, station: false },
     video: { drone: null, station: null },      
@@ -93,6 +94,7 @@ const StationProvider = ({ children, timeout=500 }) => {
             data: data,
             loading: loading,
             startTest: (cell, password, testType) => sendTestEvent(cell, password, testType),
+            changeCustomMission: (custom_mission) => sendCustomMissionEvent(custom_mission),
             connection: { drone: droneConnected, station: stationConnected },
             isConnected: stationConnected && droneConnected,
             video: { drone: droneFrame, staion: stFrame },

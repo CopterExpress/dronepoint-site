@@ -1,4 +1,4 @@
-import { Box, Button, makeStyles, Typography, useMediaQuery } from '@material-ui/core'
+import { Box, Button, FormControlLabel, makeStyles, Switch, Typography, useMediaQuery } from '@material-ui/core'
 import React, { useContext, useState } from 'react'
 import { StationContext } from '../contexts/StationProvider';
 import Cells from './Cells';
@@ -47,11 +47,22 @@ const useStyles = makeStyles(theme => ({
             width: 300,
         },
     },
+    switchBox: {
+        marginTop: 20,
+    },
+    switchLabel: {
+        fontSize: 24,
+        fontWeight: 500,
+        color: 'black',
+    },
+    switch: {
+        transform: 'scale(1.4)'
+    },
 }));
 
 const ActionBox = ({ cell, allCells, onCellChange, onTest }) => {
     const classes = useStyles();
-    const { data, isConnected, connection } = useContext(StationContext); 
+    const { data, isConnected, connection, changeCustomMission } = useContext(StationContext); 
     const [open, setOpen] = useState(false);
     const [testType, setTestType] = useState(null);
     const isMobile = useMediaQuery(theme => theme.breakpoints.down('sm'));
@@ -70,6 +81,11 @@ const ActionBox = ({ cell, allCells, onCellChange, onTest }) => {
         setOpen(false);
         setTestType(null);
     };
+
+    const handleCustomMissionChange = async (e) => {
+        e.preventDefault();
+        changeCustomMission(!data.custom_mission);
+    }
 
     const droneDisabled = data.executing || !connection.drone;
     const stationDisabled = data.executing || !connection.station;
@@ -124,6 +140,20 @@ const ActionBox = ({ cell, allCells, onCellChange, onTest }) => {
                         Execute Mission
                     </Typography>
                 </Button>
+                <FormControlLabel
+                className={classes.switchBox}
+                control={(
+                    <Switch 
+                    color="primary" 
+                    size="medium" 
+                    className={classes.switch} 
+                    checked={data.custom_mission} 
+                    onChange={handleCustomMissionChange}
+                    />
+                )}
+                label="Custom Mission Enabled"
+                classes={{ label: classes.switchLabel }}
+                labelPlacement="top" />
             </Box>
             <Box className={classes.stateBox}>
                 <Typography variant="h2" align="center" className={classes.state}>

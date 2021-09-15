@@ -164,11 +164,11 @@ class DroneController:
             homelocation[1], # lon
             altitude)
     
-    def execute_flight(self, last_item_handler=None):
+    def execute_flight(self, last_item_handler=None, custom_mission=False):
         # Clear old history
         self.history = [self.pos[:]]
         # Start mission
-        mission_count = self.start_flight_mission()
+        mission_count = self.start_flight_mission(custom_mission)
         # Cooldown
         time.sleep(15)
         # Time Counter
@@ -188,26 +188,26 @@ class DroneController:
         return time.time() - start_time
 
     # Initiate flight mission
-    def start_flight_mission(self):
-        custom_msg = 'WITH' if config.DRONE_CUSTOM_MISSION else 'WITHOUT'
+    def start_flight_mission(self, custom_mission):
+        custom_msg = 'WITH' if custom_mission else 'WITHOUT'
         observer.write(f'Initiating Flight Mission {custom_msg} Custom Mission')
         wp.clear()
         # Frame
         frame = mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT
-        p = mavlink.MAVLink_mission_item_message(
-            self.mavconn.target_system,
-            self.mavconn.target_component,
-            0,
-            mavlink.MAV_FRAME_MISSION,
-            mavlink.MAV_CMD_DO_CHANGE_SPEED,
-            0,
-            1,
-            0, 30, 0, 0,
-            0,
-            0,
-            0,
-        )
-        wp.add(p)
+        # p = mavlink.MAVLink_mission_item_message(
+        #     self.mavconn.target_system,
+        #     self.mavconn.target_component,
+        #     0,
+        #     mavlink.MAV_FRAME_MISSION,
+        #     mavlink.MAV_CMD_DO_CHANGE_SPEED,
+        #     0,
+        #     1,
+        #     0, 30, 0, 0,
+        #     0,
+        #     0,
+        #     0,
+        # )
+        # wp.add(p)
         # Takeoff
         p = mavlink.MAVLink_mission_item_message(
             self.mavconn.target_system,
@@ -305,13 +305,18 @@ class DroneController:
         
         self.listening = False
 
+        wp.save('mission.txt')
+
         # If custom mission, send waypoints
-        if config.DRONE_CUSTOM_MISSION:
+        if custom_mission:
             # Send waypoints
             observer.write('Clearing waypoints')
             self.mavconn.waypoint_clear_all_send()
             mission_ack = self.mavconn.recv_match(type=['MISSION_ACK'], blocking=True)
             observer.write(str(mission_ack))
+            time.sleep(2)
+            # time.sleep(10)
+            # observer.write('1')
             observer.write('Sending waypoint count')
             self.mavconn.waypoint_count_send(wp.count())
 
@@ -320,7 +325,10 @@ class DroneController:
                 observer.write(str(msg))
                 self.mavconn.mav.send(wp.wp(msg.seq))
                 observer.write(f'Sending waypoint {msg.seq}')
+        
+        # wp.save('miss.txt')
 
+        time.sleep(5)
         # Start Mission
         self.mavconn.set_mode_auto()
         self.listening = True
