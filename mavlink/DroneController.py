@@ -321,7 +321,7 @@ class DroneController:
             self.mavconn.waypoint_count_send(wp.count())
 
             for i in range(wp.count()):
-                msg = self.mavconn.recv_match(type=['MISSION_REQUEST'], blocking=True)
+                msg = self.mavconn.recv_match(type=['MISSION_REQUEST', 'MISSION_REQUEST_INT'], blocking=True)
                 observer.write(str(msg))
                 self.mavconn.mav.send(wp.wp(msg.seq))
                 observer.write(f'Sending waypoint {msg.seq}')
