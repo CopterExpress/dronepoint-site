@@ -55,9 +55,9 @@ class DroneController:
     def listen_messages(self):
         observer.write('Started watching messages')
         while True:
-            if not self.listening:
-                time.sleep(1)
-                continue
+            # if not self.listening:
+            #     time.sleep(1)
+            #     continue
             msg = self.mavconn.recv_match(blocking=True, timeout=config.DRONE_CONNECTION_TIMEOUT)
             # Check if msg is None
             if not msg:
@@ -138,7 +138,8 @@ class DroneController:
     
     # Heartbeat listener: update drone's state (armed)
     def HEARTBEAT_HANDLER(self, msg_dict):
-        self.armed = msg_dict["system_status"] == 4
+        # self.armed = msg_dict["system_status"] == 4
+        self.armed = (msg_dict['base_mode'] & mavlink.MAV_MODE_FLAG_SAFETY_ARMED) != 0
     
     # Extended sys state listener: update drone's landed_state
     def EXTENDED_SYS_STATE_HANDLER(self, msg_dict):
@@ -201,8 +202,8 @@ class DroneController:
         #     mavlink.MAV_FRAME_MISSION,
         #     mavlink.MAV_CMD_DO_CHANGE_SPEED,
         #     0,
-        #     1,
-        #     0, 30, 0, 0,
+        #     3,
+        #     5, 0, 0, 0,
         #     0,
         #     0,
         #     0,
@@ -315,8 +316,6 @@ class DroneController:
             mission_ack = self.mavconn.recv_match(type=['MISSION_ACK'], blocking=True)
             observer.write(str(mission_ack))
             time.sleep(2)
-            # time.sleep(10)
-            # observer.write('1')
             observer.write('Sending waypoint count')
             self.mavconn.waypoint_count_send(wp.count())
 
