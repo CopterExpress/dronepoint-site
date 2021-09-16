@@ -1,18 +1,26 @@
 const rtsp = require('rtsp-ffmpeg');
 const app = require('express')();
 const cors = require('cors');
+require('dotenv').config({ path: '../.env' });
 
 app.use(cors());
 
 const server = require('http').Server(app);
 const io = require('socket.io')(server, { cors: { origin: '*' }});
 
+const params = {
+  resolution: '720x576',
+  rate: 15,
+}
+
 const stream = new rtsp.FFMpeg({ 
-  input: 'http://190.0.0.182:8080/stream?topic=/front_camera/image_raw'
+  ...params,
+  input: `http://${process.env.DRONE_CONNECTION.split(':')[1]}:8080/stream?topic=/front_camera/image_raw`
 })
 
 const dpStream = new rtsp.FFMpeg({
-  input: 'http://190.0.0.182:8080/stream?topic=/thermal_camera/image_raw',
+  ...params,
+  input: `http://${process.env.DRONE_CONNECTION.split(':')[1]}:8080/stream?topic=/thermal_camera/image_raw`,
 })
 
 const startStream = (streamObj) => {
