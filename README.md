@@ -2,7 +2,7 @@
 
 Station Website is software that allows you to communicate with Station and PX4 Copter
 
-# Setup
+## Setup
 
 On your local machine, clone this repo:
 
@@ -32,17 +32,17 @@ docker-compose up
 
 Visit your website on [http://localhost:3000](http://localhost:3000)
 
-# Usage
+## Usage
 
 Check if your **drone** and **station** are connected
 
 ![connection](media/Connection.png)
 
-## Custom mission enabled toggle switch:
+### Custom mission enabled toggle switch:
 - **On**: Mission will be uploaded to drone directly from script
 - **Off**: Mission must be preuploaded to drone via [QGroundControl](http://qgroundcontrol.com/)
 
-## Testing state (bold text in middle of the page):
+### Testing state (bold text in middle of the page):
 - **idle**: Default state, testing hasn't started
 - **opening**: Station is opening
 - **flying**: Drone is armed, and executing mission
@@ -50,16 +50,16 @@ Check if your **drone** and **station** are connected
 - **closing**: Station is closing
 - **error**: Error state
 
-## Parameters
+### Parameters
 Test parameters are visible on the left side. They include information about drone, station and testing state
 
 ![params](media/Params.png)
 
-## Console
+### Console
 You can find testing progress in **console**
 
 ![console](media/Console.png)
 
-# Execute test
+## Execute test
 
 In order to execute full **station + drone** iteration, click on **Execute Mission** button and enter the password (configurable in **.env** file)
