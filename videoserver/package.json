@@ -4,6 +4,7 @@
   "description": "",
   "main": "videoStream.js",
   "scripts": {
+    "start": "node videoStream.js dev",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

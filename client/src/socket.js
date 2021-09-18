@@ -4,7 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 export const DRONE_CAMERA_URL = 'http://192.168.194.132:8080/stream?topic=/main_camera/image_raw';
 
-const socket = io(`/`);
+const socket = io(`http://127.0.0.1:5000`);
 
 export const subscribeDataEvent = (cb) => {
     socket.on('data', cb);

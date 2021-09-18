@@ -1,5 +1,9 @@
 FROM node:12
 
+RUN apt-get -y update
+
+RUN apt-get install -y ffmpeg
+
 WORKDIR .
 
 COPY package*.json ./
@@ -10,4 +14,4 @@ COPY . .
 
 EXPOSE 5001
 
-CMD [ "node", "videoserver.js" ]
+CMD node videoStream.js prod

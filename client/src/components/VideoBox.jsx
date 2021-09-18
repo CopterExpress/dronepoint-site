@@ -25,7 +25,7 @@ const VideoBox = ({ height, src, ws, type, className }) => {
 
     useEffect(() => {
         if (ws) {
-            const socket = io(process.env.REACT_APP_VIDEO_URL);
+            const socket = io(process.env.REACT_APP_VIDEO_URL || 'http://127.0.0.1:5001');
             socket.on(type === 'drone' ? 'dronedata' : 'stationdata', data => {
                 imageRef.current.src = 'data:image/jpeg;base64,' + data;
             })

@@ -2,7 +2,6 @@ version: '3'
 services:
   python-server:
     image: python-server
-    network_mode: host
     ports:
       - '5000:5000'
       - '0.0.0.0:14550:14550/udp'
@@ -10,9 +9,14 @@ services:
     build: .
   react-server:
     image: react-server
-    network_mode: host
     ports:
       - '3000:3000'
     build: ./client
     depends_on:
       - python-server
+  video-server:
+    image: video-server
+    ports:
+      - '5001:5001'
+    env_file: .env
+    build: ./videoserver
