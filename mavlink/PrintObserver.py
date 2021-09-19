@@ -1,4 +1,5 @@
 from collections import deque
+from typing import Callable
 
 class PrintObserver:
     def __init__(self) -> None:
@@ -8,13 +9,13 @@ class PrintObserver:
     def get_messages(self):
         return list(self._messages)
     
-    def subscribe_handler(self, func):
+    def subscribe_handler(self, func: Callable):
         self._handler = func
     
     def unsubscribe_handler(self):
         self._handler = lambda x: x
     
-    def write(self, message):
+    def write(self, message: str):
         print(message)
         self._messages.append(message)
         self._handler(self.get_messages())

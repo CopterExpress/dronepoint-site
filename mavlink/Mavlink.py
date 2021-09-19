@@ -1,24 +1,23 @@
-from mavlink.DroneController import DroneController
+from .Station import Station
+from .Drone import Drone
 import os
 import logging
 import time
 import threading
 
-from pymavlink import mavutil, mavwp
-from pymavlink.mavutil import mavlink
 import math
-from .StationController import StationController
-from .config import DronepointConfig as config
 from .PrintObserver import observer
+from config import DRONE_CONNECTION, STATION_CONNECTION
+from .classes import StationConfig, SystemState, Config
 
 class Mavlink:
     def __init__(self):
         # Mission Execution param (bool)
         self.executing = False
         # Station Controller
-        self.station_controller = StationController()
+        self.station_controller = Station(STATION_CONNECTION)
         # Drone Controller
-        self.drone_controller = DroneController()
+        self.drone_controller = Drone(DRONE_CONNECTION)
         # Custom mission
         self.custom_mission = True
     
@@ -72,13 +71,13 @@ class Mavlink:
         observer.write(f'end angle: {self.drone_controller.angle}')
         observer.write(f'Flight ended in {time_flight}')
 
-    def execute_iteration(self, flight=False):
+    def execute_iteration(self, flight: bool=False):
         def open_irlock():
             observer.write('Opening Irlock')
-            self.station_controller.send_command(config.STATE_SERVICE, config.CUSTOM_MODE_LOCK_ON)
+            self.station_controller.open_irlock()
         def close_irlock():
             observer.write('Closing Irlock')
-            self.station_controller.send_command(config.STATE_SERVICE, config.CUSTOM_MODE_LOCK_OFF)
+            self.station_controller.close_irlock()
 
         # Debug
         observer.write(f'Iteration for station started')
@@ -89,16 +88,16 @@ class Mavlink:
         start_time = time.time()
 
         # Delay
-        time.sleep(config.STATION_DELAY)
+        time.sleep(Config.TEST_DELAY)
 
         # Open
-        time_open = self.station_controller.execute_command(config.STATE_OPEN, 1)
+        time_open = self.station_controller.execute_command(StationConfig.state.OPEN, 1)
         # Delay
-        time.sleep(config.STATION_DELAY)
+        time.sleep(Config.TEST_DELAY)
         
         open_irlock()
         # Delay
-        time.sleep(config.STATION_DELAY)
+        time.sleep(Config.TEST_DELAY)
 
         # Execute drone flight
         if flight:
@@ -108,16 +107,16 @@ class Mavlink:
             time_flight = 0.0
             observer.write('No flight')
         # Delay
-        time.sleep(config.STATION_DELAY)
+        time.sleep(Config.TEST_DELAY)
 
         # Lock
-        time_lock = self.station_controller.execute_command(config.STATE_LOCK_LOCK)
+        time_lock = self.station_controller.execute_command(StationConfig.state.LOCK_LOCK)
         # Delay
-        time.sleep(config.STATION_DELAY)
+        time.sleep(Config.TEST_DELAY)
 
-        time_close = self.station_controller.execute_command(config.STATE_CLOSED)
+        time_close = self.station_controller.execute_command(StationConfig.state.CLOSED)
         # Delay
-        time.sleep(config.STATION_DELAY)
+        time.sleep(Config.TEST_DELAY)
 
         # Irlock off
         if flight:
@@ -149,8 +148,8 @@ class Mavlink:
             "armed": self.drone_controller.armed,
             "landing_state": self.drone_controller.landed_state,
             "executing": self.executing,
-            "state": self.get_state(),
-            "station_pos": [config.STATION_LAT, config.STATION_LON],
+            "state": self.get_state().value,
+            "station_pos": [Config.STATION_LAT, Config.STATION_LON],
             "drone_history": self.drone_controller.history,
             "connection": {
                 "drone": self.drone_controller.connected,
@@ -163,21 +162,21 @@ class Mavlink:
     def get_state(self):
         # Check flight
         if self.drone_controller.connected and self.drone_controller.armed:
-            return config.FLYING
+            return SystemState.FLYING
         # Check dronepoint states
         state_to_test = {
-            config.STATE_STANDBY: config.IDLE,
-            config.STATE_CLOSING: config.CLOSING,
-            config.STATE_OPENING: config.OPENING,
-            config.STATE_LOCK_RELEASE: config.RELEASING,
-            config.STATE_LOCK_LOCK: config.LOCKING,
-            config.STATE_ERROR: config.ERROR,
+            StationConfig.state.STANDBY: SystemState.IDLE,
+            StationConfig.state.CLOSING: SystemState.CLOSING,
+            StationConfig.state.OPENING: SystemState.OPENING,
+            StationConfig.state.LOCK_RELEASE: SystemState.RELEASING,
+            StationConfig.state.LOCK_LOCK: SystemState.LOCKING,
+            StationConfig.state.ERROR: SystemState.ERROR,
         }
         if not self.station_controller.connected:
-            return config.IDLE
+            return SystemState.IDLE
         if self.station_controller.custom_mode in state_to_test.keys():
             return state_to_test[self.station_controller.custom_mode]
-        return config.IDLE
+        return SystemState.IDLE
 
 if __name__ == '__main__':
     mavlink = Mavlink()
