@@ -27,6 +27,7 @@ Make sure you have [Docker](https://docs.docker.com/get-docker/) and [docker-com
 Build and run the project
 
 ```bash
+docker-compose build
 docker-compose up
 ```
 
