@@ -22,7 +22,7 @@ DRONE_CONNECTION=udpout:<your_drone_ip>:14550
 STATION_CONNECTION=udpout:<your_station_ip>:14542
 ```
 
-Make sure you have [Docker](https://docs.docker.com/get-docker/) installed
+Make sure you have [Docker](https://docs.docker.com/get-docker/) and [docker-compose](https://docs.docker.com/compose/install/) installed
 
 Build and run the project
 
