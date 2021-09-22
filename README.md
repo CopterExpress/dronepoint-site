@@ -7,7 +7,7 @@ Station Website is software that allows you to communicate with Station and PX4 
 On your local machine, clone this repo:
 
 ```bash
-git clone https://github.com/CopterExpress/station-test.git
+git clone https://github.com/CopterExpress/dronepoint-site.git
 cd station-test
 ```
 
