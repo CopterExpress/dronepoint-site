@@ -8,7 +8,7 @@ On your local machine, clone this repo:
 
 ```bash
 git clone https://github.com/CopterExpress/dronepoint-site.git
-cd station-test
+cd dronepoint-site
 ```
 
 Then create **.env** file in *station-test* folder and put the following:
