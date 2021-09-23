@@ -60,13 +60,6 @@ class Config:
 
     DRONE_HEARTBEAT_DELAY = 0.5
 
-    # Flight
-    FLIGHT_DISTANCE = 0.00018 # 20 meters
-    FLIGHT_ALT = 15
-    
-    # Minimum difference of position to update history
-    MIN_POS_DIFFERENCE = 100
-
     # Delay (seconds)
     TEST_DELAY = 1
 

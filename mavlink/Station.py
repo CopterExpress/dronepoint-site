@@ -56,7 +56,7 @@ class Station(MavlinkVehicle):
         param1: StationConfig.custom_mode=0, 
         param2=0, param3=0, param4=0, param5=0
     ) -> float:
-        self._send_command(self, mode, param1, param2, param3, param4, param5)
+        self._send_command(mode, param1, param2, param3, param4, param5)
         # Wait until custom_mode is in STANDBY mode (12)
         time.sleep(3)
         # Time counter

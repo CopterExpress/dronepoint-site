@@ -47,40 +47,44 @@ const dpStream = new rtsp.FFMpeg({
   input: `http://${CONNECTION_URL.split(':')[1]}:8080/stream?topic=/thermal_camera/image_raw`,
 })
 
-const startStream = (streamObj) => {
+const startStream = (streamObj, i) => {
   console.log(`Starting connection to ${CONNECTION_URL.split(':')[1]}`);
   streamObj.on('error', e => {
     console.log('Error in Stream');
   });
   streamObj.on('start', () => {
-    console.log('Stream started');
+    console.log(`Stream ${i} started`);
   })
   streamObj.on('close', e => {
-    console.log('Stream closed');
+    console.log(`Stream ${i} closed`);
     // streamObj.start();
   });
+  streamObj.on('data', () => {
+      console.log(`receive data ${i}`);
+  })
   streamObj.start();
 }
 
-startStream(stream);
-startStream(dpStream);
+const streams = Array(1000).fill(stream);
 
-io.on('connection', (socket) => {
-  console.log('connection');
-  const pipeStream = (data) => {
-    socket.emit('dronedata', data.toString('base64'))
-  }
-  const dpPipeStream = (data) => {
-    socket.emit('stationdata', data.toString('base64'));
-  }
-  stream.on('data', pipeStream);
-  dpStream.on('data', dpPipeStream);
-  socket.on('disconnect', () => {
-    stream.removeListener('data', pipeStream);
-    dpStream.removeListener('data', pipeStream);
-  });
-})
+streams.forEach(startStream);
+
+// io.on('connection', (socket) => {
+//   console.log('connection');
+//   const pipeStream = (data) => {
+//     socket.emit('dronedata', data.toString('base64'))
+//   }
+//   const dpPipeStream = (data) => {
+//     socket.emit('stationdata', data.toString('base64'));
+//   }
+//   stream.on('data', pipeStream);
+//   dpStream.on('data', dpPipeStream);
+//   socket.on('disconnect', () => {
+//     stream.removeListener('data', pipeStream);
+//     dpStream.removeListener('data', pipeStream);
+//   });
+// })
 
 server.listen(5001, () => {
-  console.log('START SERVER');
+  console.log('Front test');
 });

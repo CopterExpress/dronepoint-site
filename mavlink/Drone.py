@@ -226,9 +226,12 @@ class Drone(MavlinkVehicle):
         if custom_mission:
             self.create_waypoints()
             # Send waypoints
-            self.msg_write('Clearing waypoints')
-            self.mavconn.waypoint_clear_all_send()
-            mission_ack = self.mavconn.recv_match(type=['MISSION_ACK'], blocking=True)
+            while True:
+                self.msg_write('Clearing waypoints')
+                self.mavconn.waypoint_clear_all_send()
+                mission_ack = self.mavconn.recv_match(type=['MISSION_ACK'], blocking=True, timeout=2)
+                if mission_ack:
+                    break
             self.msg_write(str(mission_ack))
             time.sleep(2)
             self.msg_write('Sending waypoint count')
@@ -243,8 +246,33 @@ class Drone(MavlinkVehicle):
                 self.mavconn.mav.send(wp.wp(msg.seq))
                 self.msg_write(f'Sending waypoint {msg.seq}')
         
-        time.sleep(5)
-        # Start Mission
-        self.mavconn.set_mode_auto()
+        time.sleep(3)
+        # Start Mission (Arm Drone)
+        while True:
+            self.mavconn.set_mode_auto()
+            command_ack = self.mavconn.recv_match(
+                type=['COMMAND_ACK'],
+                blocking=True,
+                timeout=2
+            )
+            self.msg_write('Resending mission start')
+            if command_ack:
+                break
+        # while True:
+        #     self.mavconn.mav.command_long_send(
+        #             self.mavconn.target_system,
+        #             self.mavconn.target_component,
+        #             mavlink.MAV_CMD_COMPONENT_ARM_DISARM,
+        #             0,
+        #             1, 0, 0, 0, 0, 0, 0
+        #         )
+        #     command_ack = self.mavconn.recv_match(
+        #         type=['COMMAND_ACK'],
+        #         blocking=True,
+        #         timeout=2
+        #     )
+        #     if command_ack:
+        #         break
+        self.msg_write('Command ack')
         self.msg_write(f'Started Mission with {wp.count()} waypoints')
         return wp.count() if custom_mission else 5
