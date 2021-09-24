@@ -16,6 +16,8 @@ wp = mavwp.MAVWPLoader()
 
 class Drone(MavlinkVehicle):
     def __init__(self, connection_url: str) -> None:
+        # Battery
+        self.battery_remaining = 100
         # Drone parameters
         self.pos = [0, 0]
         self.alt = 0
@@ -32,6 +34,7 @@ class Drone(MavlinkVehicle):
             mavlink.MAVLINK_MSG_ID_EXTENDED_SYS_STATE: self.EXTENDED_SYS_STATE_HANDLER,
             mavlink.MAVLINK_MSG_ID_HEARTBEAT: self.HEARTBEAT_HANDLER,
             mavlink.MAVLINK_MSG_ID_MISSION_CURRENT: self.MISSION_ITEM_HANDLER,
+            mavlink.MAVLINK_MSG_ID_BATTERY_STATUS: self.BATTERY_STATUS_HANDLER,
             # mavlink.MAVLINK_MSG_ID_GPS_RAW_INT: self.GLOBAL_POSITION_INT_HANDLER,
         }
         # Init connection
@@ -81,6 +84,9 @@ class Drone(MavlinkVehicle):
         if landed_state != self.landed_state:
             self.landed_state = landed_state
             self.msg_write(f"Updated Landed State to {landed_state}")
+    
+    def BATTERY_STATUS_HANDLER(self, msg_dict: dict):
+        self.battery_remaining = msg_dict['battery_remaining']
 
     # Set home
     def set_home(self, homelocation, altitude):
@@ -273,6 +279,6 @@ class Drone(MavlinkVehicle):
         #     )
         #     if command_ack:
         #         break
-        self.msg_write('Command ack')
+        self.msg_write(str(command_ack))
         self.msg_write(f'Started Mission with {wp.count()} waypoints')
         return wp.count() if custom_mission else 5

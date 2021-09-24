@@ -3,6 +3,7 @@ import React, { useContext, useState } from 'react'
 import { StationContext } from '../contexts/StationProvider';
 import { getAllCells } from '../utils/cells';
 import ActionBox from './ActionBox';
+import Battery from './Battery';
 import DroneInfo from './DroneInfo';
 import DroneMap from './DroneMap';
 import Logger from './Logger';
@@ -45,6 +46,12 @@ const useStyles = makeStyles(theme => ({
     },
     mobileVideoItem: {
         flex: '50%',
+    },
+    container: {
+        display: 'flex',
+        height: '100vh',
+        flexDirection: 'column',
+        justifyContent: 'stretch',
     },
 }));
 
@@ -105,7 +112,7 @@ const MainPage = () => {
     )
 
     return (
-        <React.Fragment>
+        <Box className={classes.container}>
             <Box className={classes.main}>
                 <Box className={classes.left}>
                     <DroneMap
@@ -148,7 +155,8 @@ const MainPage = () => {
                     />
                 </Box>
             </Box>
-        </React.Fragment>
+            <Battery />
+        </Box>
     )
 }
 

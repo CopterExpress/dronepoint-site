@@ -22,6 +22,10 @@ const useStyles = makeStyles(theme => ({
         marginRight: 15,
         height: '100%',
         overflowY: 'scroll',
+        maxWidth: '33vw',
+    },
+    code: {
+        maxWidth: 'inherit',
     },
     header: {
         marginTop: 10,
@@ -56,7 +60,7 @@ const Logger = () => {
             </Box>
             <div className={clsx(classes.root, 'custom-scrollbar')} ref={boxRef}>
                 <pre>
-                    <code>
+                    <code className={classes.code}>
                         {logInfo.map(message => (
                             <React.Fragment>
                                 {message}{'\n'}

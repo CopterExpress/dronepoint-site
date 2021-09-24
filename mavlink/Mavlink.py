@@ -146,6 +146,7 @@ class Mavlink:
             "pos": self.drone_controller.pos,
             "alt": self.drone_controller.alt,
             "armed": self.drone_controller.armed,
+            "battery": self.drone_controller.battery_remaining,
             "landing_state": self.drone_controller.landed_state,
             "executing": self.executing,
             "state": self.get_state().value,
