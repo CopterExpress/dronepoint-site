@@ -1,4 +1,4 @@
-FROM python:3
+FROM python:3.8
 
 # Update and allow for apt over HTTPS
 
