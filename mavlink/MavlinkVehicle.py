@@ -11,7 +11,7 @@ class MavlinkVehicle:
     def __init__(
         self, 
         connection_url: str, 
-        handlers: dict[int, Callable],
+        handlers: dict,
         name: str,
         connection_timeout: float,
         heartbeat_delay: float,
