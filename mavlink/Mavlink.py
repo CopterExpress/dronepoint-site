@@ -8,7 +8,7 @@ import threading
 import math
 from .PrintObserver import observer
 from config import DRONE_CONNECTION, STATION_CONNECTION
-from .classes import StationConfig, SystemState, Config
+from .classes import DroneConfig, StationConfig, SystemState, Config
 
 class Mavlink:
     def __init__(self):
@@ -63,11 +63,26 @@ class Mavlink:
             observer.write('Error. Invalid Test Type')
 
         self.executing = False
+    
+    def execute_flight_around_zone(self, trail):
+        observer.write('Zone Flight Started')
+        time_flight = self.drone_controller.execute_flight(trail=trail)
+        observer.write(f'end angle: {self.drone_controller.angle}')
+        observer.write(f'Zone Flight ended in {time_flight}')
 
     def execute_flight(self):
+        # Get sample trail
+        init_pos = self.drone_controller.pos[:]
+        T = [
+            [init_pos[0] + DroneConfig.FLIGHT_DISTANCE, init_pos[1]],
+            [init_pos[0] + DroneConfig.FLIGHT_DISTANCE, init_pos[1] + DroneConfig.FLIGHT_DISTANCE],
+            [init_pos[0] + 2 * DroneConfig.FLIGHT_DISTANCE, init_pos[1] + DroneConfig.FLIGHT_DISTANCE],
+            [init_pos[0] + 2 * DroneConfig.FLIGHT_DISTANCE, init_pos[1] + 2 * DroneConfig.FLIGHT_DISTANCE],
+        ]
         observer.write('Flight started')
         observer.write(f'start angle: {self.drone_controller.angle}')
-        time_flight = self.drone_controller.execute_flight(custom_mission=self.custom_mission)
+        # time_flight = self.drone_controller.execute_flight(custom_mission=self.custom_mission)
+        time_flight = self.drone_controller.execute_flight(trail=T)
         observer.write(f'end angle: {self.drone_controller.angle}')
         observer.write(f'Flight ended in {time_flight}')
 

@@ -103,6 +103,76 @@ class Drone(MavlinkVehicle):
             homelocation[1], # lon
             altitude)
     
+    def create_trail_waypoints(self, trail):
+        self.msg_write('Adding Trail waypoints')
+        wp.clear()
+        # Frame
+        frame = mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT
+        # Takeoff
+        p = mavlink.MAVLink_mission_item_message(
+            self.mavconn.target_system,
+            self.mavconn.target_component,
+            0,
+            frame,
+            mavlink.MAV_CMD_NAV_TAKEOFF,
+            0,
+            1,
+            15, 0, 0, math.nan,
+            self.pos[0],
+            self.pos[1],
+            DroneConfig.FLIGHT_ALT,
+        )
+        wp.add(p)
+        # Flight
+        for point in trail:
+            p = mavlink.MAVLink_mission_item_message(
+                self.mavconn.target_system,
+                self.mavconn.target_component,
+                1,
+                frame,
+                mavlink.MAV_CMD_NAV_WAYPOINT,
+                0,
+                1,
+                0, 10, 0, math.nan,
+                point[0],
+                point[1],
+                DroneConfig.FLIGHT_ALT,
+            )
+            wp.add(p)
+        for point in trail[::-1]:
+            p = mavlink.MAVLink_mission_item_message(
+                self.mavconn.target_system,
+                self.mavconn.target_component,
+                1,
+                frame,
+                mavlink.MAV_CMD_NAV_WAYPOINT,
+                0,
+                1,
+                0, 10, 0, math.nan,
+                point[0],
+                point[1],
+                DroneConfig.FLIGHT_ALT,
+            )
+            wp.add(p)
+        # Land
+        p = mavlink.MAVLink_mission_item_message(
+            self.mavconn.target_system,
+            self.mavconn.target_component,
+            2,
+            frame,
+            mavlink.MAV_CMD_NAV_LAND,
+            0,
+            1,
+            0, 
+            2, # Precision land mode 
+            0, 
+            self.angle, # Angle
+            self.pos[0], # Lat 
+            self.pos[1], # Lon
+            0, # Alt
+        )
+        wp.add(p)
+    
     def create_waypoints(self):
         wp.clear()
         # Frame
@@ -202,11 +272,14 @@ class Drone(MavlinkVehicle):
         )
         wp.add(p)
     
-    def execute_flight(self, last_item_handler=None, custom_mission=False):
+    def execute_flight(self, last_item_handler=None, custom_mission=False, trail=None):
         # Clear old history
         self.history = [self.pos[:]]
         # Start mission
-        mission_count = self.start_mission(custom_mission)
+        if trail:
+            mission_count = self.start_mission_trail(trail)
+        else:
+            mission_count = self.start_mission(custom_mission)
         # Cooldown
         time.sleep(15)
         # Time Counter
@@ -224,6 +297,45 @@ class Drone(MavlinkVehicle):
         # Debug
         self.msg_write(f'Finished Flight in {time.time() - start_time} s')
         return time.time() - start_time
+
+    
+    def start_mission_trail(self, trail):
+        self.msg_write(f'Initiating Flight Mission with trail')
+        self.create_trail_waypoints(trail)
+        # Send waypoints 
+        while True:
+            self.msg_write('Clearing waypoints')
+            self.mavconn.waypoint_clear_all_send()
+            mission_ack = self.mavconn.recv_match(type=['MISSION_ACK'], blocking=True, timeout=2)
+            if mission_ack:
+                break
+        self.msg_write(str(mission_ack))
+        time.sleep(2)
+        self.msg_write('Sending waypoint count')
+        self.mavconn.waypoint_count_send(wp.count())
+
+        for i in range(wp.count()):
+            msg = self.mavconn.recv_match(
+                type=['MISSION_REQUEST', 'MISSION_REQUEST_INT'], 
+                blocking=True
+            )
+            self.msg_write(str(msg))
+            self.mavconn.mav.send(wp.wp(msg.seq))
+            self.msg_write(f'Sending waypoint {msg.seq}')
+        # Start Mission (Arm Drone)
+        while True:
+            self.mavconn.set_mode_auto()
+            command_ack = self.mavconn.recv_match(
+                type=['COMMAND_ACK'],
+                blocking=True,
+                timeout=2
+            )
+            self.msg_write('Resending mission start')
+            if command_ack:
+                break
+        self.msg_write(str(command_ack))
+        self.msg_write(f'Started Trail Mission with {wp.count()} waypoints')
+        return wp.count()
 
     def start_mission(self, custom_mission: bool):
         custom_msg = 'WITH' if custom_mission else 'WITHOUT'
