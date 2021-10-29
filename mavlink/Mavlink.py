@@ -71,18 +71,18 @@ class Mavlink:
         observer.write(f'Zone Flight ended in {time_flight}')
 
     def execute_flight(self):
-        # Get sample trail
-        init_pos = self.drone_controller.pos[:]
-        T = [
-            [init_pos[0] + DroneConfig.FLIGHT_DISTANCE, init_pos[1]],
-            [init_pos[0] + DroneConfig.FLIGHT_DISTANCE, init_pos[1] + DroneConfig.FLIGHT_DISTANCE],
-            [init_pos[0] + 2 * DroneConfig.FLIGHT_DISTANCE, init_pos[1] + DroneConfig.FLIGHT_DISTANCE],
-            [init_pos[0] + 2 * DroneConfig.FLIGHT_DISTANCE, init_pos[1] + 2 * DroneConfig.FLIGHT_DISTANCE],
-        ]
+        # # Get sample trail
+        # init_pos = self.drone_controller.pos[:]
+        # T = [
+        #     [init_pos[0] + DroneConfig.FLIGHT_DISTANCE, init_pos[1]],
+        #     [init_pos[0] + DroneConfig.FLIGHT_DISTANCE, init_pos[1] + DroneConfig.FLIGHT_DISTANCE],
+        #     [init_pos[0] + 2 * DroneConfig.FLIGHT_DISTANCE, init_pos[1] + DroneConfig.FLIGHT_DISTANCE],
+        #     [init_pos[0] + 2 * DroneConfig.FLIGHT_DISTANCE, init_pos[1] + 2 * DroneConfig.FLIGHT_DISTANCE],
+        # ]
         observer.write('Flight started')
         observer.write(f'start angle: {self.drone_controller.angle}')
-        # time_flight = self.drone_controller.execute_flight(custom_mission=self.custom_mission)
-        time_flight = self.drone_controller.execute_flight(trail=T)
+        time_flight = self.drone_controller.execute_flight(custom_mission=self.custom_mission)
+        # time_flight = self.drone_controller.execute_flight(trail=T)
         observer.write(f'end angle: {self.drone_controller.angle}')
         observer.write(f'Flight ended in {time_flight}')
 
