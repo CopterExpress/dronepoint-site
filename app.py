@@ -1,4 +1,5 @@
 import sys
+import threading
 from mavlink.PrintObserver import observer
 from flask import Flask, request
 from flask_cors.decorator import cross_origin
@@ -59,4 +60,8 @@ def send_log():
 
 if __name__ == "__main__":
     print('STARTED APP')
+    # def start():
+    #     mavlink.execute_flight_around_zone([-22.88697155049838,  29.810392764802724])
+    # thread = threading.Thread(target=start)
+    # thread.start()
     socketio.run(app, host="0.0.0.0", port=5000)

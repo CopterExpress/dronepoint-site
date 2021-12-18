@@ -1,3 +1,4 @@
+from mavlink.coords import get_trail
 from .Station import Station
 from .Drone import Drone
 import os
@@ -64,7 +65,8 @@ class Mavlink:
 
         self.executing = False
     
-    def execute_flight_around_zone(self, trail):
+    def execute_flight_around_zone(self, pos):
+        trail = get_trail(pos, self.drone_controller.pos)
         observer.write('Zone Flight Started')
         time_flight = self.drone_controller.execute_flight(trail=trail)
         observer.write(f'end angle: {self.drone_controller.angle}')
