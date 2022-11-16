@@ -1,4 +1,4 @@
-FROM python:3.8
+FROM python:3.9
 
 # Update and allow for apt over HTTPS
 
@@ -14,6 +14,6 @@ COPY . .
 
 # RUN npm run build --prefix client
 
-EXPOSE 2000
+EXPOSE 5000
 
 CMD ["python3", "-u", "app.py"]
